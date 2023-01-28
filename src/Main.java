@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader("src/nonZero.csv"));
+        BufferedReader reader = new BufferedReader(new FileReader("src/datathon2023.txt"));
         ArrayList<Entry> entryList = new ArrayList<>();
 
         String[] msns = new String[]{"BDFDB", "BDPRP", "BFFDB", "BFPRP", "CLPRB", "CLPRK", "CLPRP",
@@ -49,15 +49,22 @@ public class Main {
 //            writer.close();
 //        }
 
-        List<Entry> nonZero = entryList.parallelStream().filter(entry -> entry.getAmount() != 0)
+        List<Entry> clean = entryList.parallelStream()
                 .filter(entry -> !entry.getMsn().equals("CLPRK") && !entry.getMsn().equals("CLPRP"))
                 .filter(entry -> !entry.getMsn().equals("COPRK") && !entry.getMsn().equals("PAPRP"))
                 .filter(entry -> !entry.getMsn().equals("NGMPK") && !entry.getMsn().equals("NGMPP"))
+                .filter(entry -> !entry.getMsn().equals("BDFDB") && !entry.getMsn().equals("BFFDB"))
+                .filter(entry -> !entry.getMsn().equals("BFPRP") && !entry.getMsn().equals("EMFDB"))
                 .toList();
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("src/nonZeroFiltered.csv"));
+        for (Entry entry : clean) {
+            if (entry.getMsn().equals("BDPRP")) entry.setAmount(entry.getAmount() * 5.46);
+            if (entry.getMsn().equals("ENPRP")) entry.setAmount(entry.getAmount() * 3.192);
+        }
 
-        for (Entry entry : nonZero) {
+        BufferedWriter writer = new BufferedWriter(new FileWriter("src/clean.csv"));
+
+        for (Entry entry : clean) {
             writer.write(entry.toString());
         }
 
