@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -11,10 +12,9 @@ public class Main {
         BufferedReader reader = new BufferedReader(new FileReader("src/datathon2023.txt"));
         ArrayList<Entry> entryList = new ArrayList<>();
 
-        String[] msns = new String[]{"BDFDB", "BDPRP", "BFFDB", "BFPRP", "CLPRB", "CLPRK", "CLPRP",
-                "COPRK", "EMFDB", "ENPRP", "GETCB", "HYTCB", "NCPRB", "NGMPB", "NGMPK", "NGMPP",
-                "NUETB", "PAPRB", "PAPRP", "REPRB", "SOTCB", "TEPRB", "TETCB", "WDEXB", "WDPRB",
-                "WDTCB", "WSTCB", "WWPRB", "WYTCB"};
+        String[] msns = new String[]{"BDPRP", "CLPRB", "ENPRP", "GETCB", "HYTCB",
+                "NCPRB", "NGMPB", "NUETB", "PAPRB", "REPRB", "SOTCB", "TEPRB", "TETCB", "WDEXB",
+                "WDPRB", "WDTCB", "WSTCB", "WWPRB", "WYTCB"};
 
         String line;
         while ((line = reader.readLine()) != null) {
@@ -28,11 +28,16 @@ public class Main {
                 .map(Entry::getStateCode).distinct().filter(s -> !s.equals("DC") && !s.equals("US") && !s.equals("X3") && !s.equals("X5")).toList();
 
         List<Entry> clean = entryList.parallelStream().filter(entry -> !entry.getStateCode().equals("DC") && !entry.getStateCode().equals("US") && !entry.getStateCode().equals("X3") && !entry.getStateCode().equals("X5"))
-                .filter(entry -> !entry.getMsn().equals("CLPRK") && !entry.getMsn().equals("CLPRP"))
-                .filter(entry -> !entry.getMsn().equals("COPRK") && !entry.getMsn().equals("PAPRP"))
-                .filter(entry -> !entry.getMsn().equals("NGMPK") && !entry.getMsn().equals("NGMPP"))
-                .filter(entry -> !entry.getMsn().equals("BDFDB") && !entry.getMsn().equals("BFFDB"))
-                .filter(entry -> !entry.getMsn().equals("BFPRP") && !entry.getMsn().equals("EMFDB"))
+                .filter(entry -> !entry.getMsn().equals("CLPRK"))
+                .filter(entry -> !entry.getMsn().equals("COPRK"))
+                .filter(entry -> !entry.getMsn().equals("NGMPK"))
+                .filter(entry -> !entry.getMsn().equals("BDFDB"))
+                .filter(entry -> !entry.getMsn().equals("BFPRP"))
+                .filter(entry -> !entry.getMsn().equals("CLPRP"))
+                .filter(entry -> !entry.getMsn().equals("PAPRP"))
+                .filter(entry -> !entry.getMsn().equals("NGMPP"))
+                .filter(entry -> !entry.getMsn().equals("BFFDB"))
+                .filter(entry -> !entry.getMsn().equals("EMFDB"))
                 .toList();
 
 //        for (String msn : msns) {
@@ -46,15 +51,32 @@ public class Main {
 //            double avg = entries.parallelStream().map(Entry::getAmount).reduce(0.0, Double::sum)/entries.size();
 //        }
 
+        ArrayList<State> stateArrayList = new ArrayList<>();
+
         for (String state : states) {
-            List<Entry> stateEntries = clean.parallelStream().filter(entry -> entry.getStateCode().equals(state)).toList();
-            BufferedWriter writer = new BufferedWriter(new FileWriter("src/states/" + state + ".csv"));
-            writer.write(",MSN,StateCode,Year,Amount,State,CO2 Emissions (Mmt),TotalNumberofInvestments,TotalAmountofAssistance\n");
-            for (Entry entry : stateEntries) {
-                writer.write(entry.toString());
+            for (int year = 2015; year < 2020; year++) {
+                int finalYear = year;
+                List<Entry> stateYear = clean.stream()
+                        .filter(entry -> entry.getStateCode().equals(state))
+                        .filter(entry -> entry.getYear() == finalYear).toList();
+                ArrayList<Double> msnVals = new ArrayList<>();
+                for (Entry entry : stateYear) {
+                    msnVals.add(entry.getAmount());
+                }
+                stateArrayList.add(new State(state, finalYear, msnVals));
             }
-            writer.close();
         }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("src/flipped.csv"));
+        writer.write("State,Year");
+        for (String msn : msns) {
+            writer.write("," + msn);
+        }
+        writer.write("\n");
+        for (State state : stateArrayList) {
+            writer.write(state.toString());
+        }
+        writer.close();
 
 //        for (Entry entry : clean) {
 //            if (entry.getMsn().equals("BDPRP")) entry.setAmount(entry.getAmount() * 5.46);
