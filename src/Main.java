@@ -25,8 +25,15 @@ public class Main {
         reader.close();
 
         List<String> states = entryList.parallelStream().filter(entry -> entry.getYear() == 2015)
-                .map(Entry::getStateCode).distinct().toList();
+                .map(Entry::getStateCode).distinct().filter(s -> !s.equals("DC") && !s.equals("US") && !s.equals("X3") && !s.equals("X5")).toList();
 
+        List<Entry> clean = entryList.parallelStream().filter(entry -> !entry.getStateCode().equals("DC") && !entry.getStateCode().equals("US") && !entry.getStateCode().equals("X3") && !entry.getStateCode().equals("X5"))
+                .filter(entry -> !entry.getMsn().equals("CLPRK") && !entry.getMsn().equals("CLPRP"))
+                .filter(entry -> !entry.getMsn().equals("COPRK") && !entry.getMsn().equals("PAPRP"))
+                .filter(entry -> !entry.getMsn().equals("NGMPK") && !entry.getMsn().equals("NGMPP"))
+                .filter(entry -> !entry.getMsn().equals("BDFDB") && !entry.getMsn().equals("BFFDB"))
+                .filter(entry -> !entry.getMsn().equals("BFPRP") && !entry.getMsn().equals("EMFDB"))
+                .toList();
 
 //        for (String msn : msns) {
 //            BufferedReader reader1 = new BufferedReader(new FileReader("src/msns/" + msn + ".csv"));
@@ -39,36 +46,28 @@ public class Main {
 //            double avg = entries.parallelStream().map(Entry::getAmount).reduce(0.0, Double::sum)/entries.size();
 //        }
 
-//        for (String msn : msns) {
-//            List<Entry> msnEntries = entryList.parallelStream().filter(entry -> entry.getMsn().equals(msn)).toList();
-//            BufferedWriter writer = new BufferedWriter(new FileWriter("src/msns/" + msn + ".csv"));
-//            writer.write(",MSN,StateCode,Year,Amount,State,CO2 Emissions (Mmt),TotalNumberofInvestments,TotalAmountofAssistance\n");
-//            for (Entry entry : msnEntries) {
-//                writer.write(entry.toString());
-//            }
-//            writer.close();
+        for (String state : states) {
+            List<Entry> stateEntries = clean.parallelStream().filter(entry -> entry.getStateCode().equals(state)).toList();
+            BufferedWriter writer = new BufferedWriter(new FileWriter("src/states/" + state + ".csv"));
+            writer.write(",MSN,StateCode,Year,Amount,State,CO2 Emissions (Mmt),TotalNumberofInvestments,TotalAmountofAssistance\n");
+            for (Entry entry : stateEntries) {
+                writer.write(entry.toString());
+            }
+            writer.close();
+        }
+
+//        for (Entry entry : clean) {
+//            if (entry.getMsn().equals("BDPRP")) entry.setAmount(entry.getAmount() * 5.46);
+//            if (entry.getMsn().equals("ENPRP")) entry.setAmount(entry.getAmount() * 3.192);
 //        }
-
-        List<Entry> clean = entryList.parallelStream()
-                .filter(entry -> !entry.getMsn().equals("CLPRK") && !entry.getMsn().equals("CLPRP"))
-                .filter(entry -> !entry.getMsn().equals("COPRK") && !entry.getMsn().equals("PAPRP"))
-                .filter(entry -> !entry.getMsn().equals("NGMPK") && !entry.getMsn().equals("NGMPP"))
-                .filter(entry -> !entry.getMsn().equals("BDFDB") && !entry.getMsn().equals("BFFDB"))
-                .filter(entry -> !entry.getMsn().equals("BFPRP") && !entry.getMsn().equals("EMFDB"))
-                .toList();
-
-        for (Entry entry : clean) {
-            if (entry.getMsn().equals("BDPRP")) entry.setAmount(entry.getAmount() * 5.46);
-            if (entry.getMsn().equals("ENPRP")) entry.setAmount(entry.getAmount() * 3.192);
-        }
-
-        BufferedWriter writer = new BufferedWriter(new FileWriter("src/clean.csv"));
-
-        for (Entry entry : clean) {
-            writer.write(entry.toString());
-        }
-
-        writer.close();
+//
+//        BufferedWriter writer = new BufferedWriter(new FileWriter("src/clean.csv"));
+//
+//        for (Entry entry : clean) {
+//            writer.write(entry.toString());
+//        }
+//
+//        writer.close();
 
 
 //        Map<String, Double> msnToMinimum = entryList.parallelStream().collect(Collectors
