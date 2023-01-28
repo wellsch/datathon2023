@@ -72,7 +72,9 @@ public class Entry {
 
     @Override
     public String toString() {
-        return this.stateCode + " " + this.msn + " " + this.year + " Emissions: " + this.emissions + " Investments: " + this.numInvestments + "-> Assistance: " + this.assistance + "\n";
+        return this.id + "," + this.msn + "," + this.stateCode + "," + this.year
+                + "," + this.amount + "," + this.state + "," + this.emissions
+                + "," + this.numInvestments + "," + this.assistance + "\n";
     }
 
     public void setAmount(double val) {

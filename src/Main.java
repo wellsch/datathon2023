@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader("src/datathon2023.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("src/nonZero.csv"));
         ArrayList<Entry> entryList = new ArrayList<>();
 
         String[] msns = new String[]{"BDFDB", "BDPRP", "BFFDB", "BFPRP", "CLPRB", "CLPRK", "CLPRP",
@@ -29,19 +27,55 @@ public class Main {
         List<String> states = entryList.parallelStream().filter(entry -> entry.getYear() == 2015)
                 .map(Entry::getStateCode).distinct().toList();
 
-        Map<String, Double> msnToMinimum = entryList.parallelStream().collect(Collectors
-                .toMap(Entry::getMsn, Entry::getAmount, Double::min));
-        Map<String, Double> msnToMaximum = entryList.parallelStream().collect(Collectors
-                .toMap(Entry::getMsn, Entry::getAmount, Double::max));
 
-        Map<String, Double> msnToRange = new HashMap<>();
+//        for (String msn : msns) {
+//            BufferedReader reader1 = new BufferedReader(new FileReader("src/msns/" + msn + ".csv"));
+//            ArrayList<Entry> entries = new ArrayList<>();
+//            while ((line = reader1.readLine()) != null) {
+//                Entry entry = Entry.readLine(line);
+//                if (entry != null) entries.add(entry);
+//            }
+//            if (msn.equals("NGMPK")) System.out.println(entries);
+//            double avg = entries.parallelStream().map(Entry::getAmount).reduce(0.0, Double::sum)/entries.size();
+//        }
 
-        for (String msn: msns) {
-            msnToRange.put(msn, msnToMaximum.get(msn) - msnToMinimum.get(msn));
+//        for (String msn : msns) {
+//            List<Entry> msnEntries = entryList.parallelStream().filter(entry -> entry.getMsn().equals(msn)).toList();
+//            BufferedWriter writer = new BufferedWriter(new FileWriter("src/msns/" + msn + ".csv"));
+//            writer.write(",MSN,StateCode,Year,Amount,State,CO2 Emissions (Mmt),TotalNumberofInvestments,TotalAmountofAssistance\n");
+//            for (Entry entry : msnEntries) {
+//                writer.write(entry.toString());
+//            }
+//            writer.close();
+//        }
+
+        List<Entry> nonZero = entryList.parallelStream().filter(entry -> entry.getAmount() != 0)
+                .filter(entry -> !entry.getMsn().equals("CLPRK") && !entry.getMsn().equals("CLPRP"))
+                .filter(entry -> !entry.getMsn().equals("COPRK") && !entry.getMsn().equals("PAPRP"))
+                .filter(entry -> !entry.getMsn().equals("NGMPK") && !entry.getMsn().equals("NGMPP"))
+                .toList();
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("src/nonZeroFiltered.csv"));
+
+        for (Entry entry : nonZero) {
+            writer.write(entry.toString());
         }
 
-        List<Entry> = entryList.parallelStream()
-                .map(entry -> entry.setAmount(((entry.getAmount()) - msnToMinimum.get(entry.getMsn()))/msnToRange.get(entry.getMsn())))
+        writer.close();
+
+
+//        Map<String, Double> msnToMinimum = entryList.parallelStream().collect(Collectors
+//                .toMap(Entry::getMsn, Entry::getAmount, Double::min));
+//        Map<String, Double> msnToMaximum = entryList.parallelStream().collect(Collectors
+//                .toMap(Entry::getMsn, Entry::getAmount, Double::max));
+//
+//        Map<String, Double> msnToRange = new HashMap<>();
+//
+//        for (String msn: msns) {
+//            msnToRange.put(msn, msnToMaximum.get(msn) - msnToMinimum.get(msn));
+//        }
+
+
 
 
 
