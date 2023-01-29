@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader("src/datathon2023.txt"));
+        BufferedReader reader = new BufferedReader(new FileReader("src/2020.csv"));
         ArrayList<Entry> entryList = new ArrayList<>();
 
         String[] msns = new String[]{"BDPRP", "CLPRB", "ENPRP", "GETCB", "HYTCB",
@@ -24,7 +24,7 @@ public class Main {
 
         reader.close();
 
-        List<String> states = entryList.parallelStream().filter(entry -> entry.getYear() == 2015)
+        List<String> states = entryList.parallelStream().filter(entry -> entry.getYear() == 2020)
                 .map(Entry::getStateCode).distinct().filter(s -> !s.equals("DC") && !s.equals("US") && !s.equals("X3") && !s.equals("X5")).toList();
 
         List<Entry> clean = entryList.parallelStream().filter(entry -> !entry.getStateCode().equals("DC") && !entry.getStateCode().equals("US") && !entry.getStateCode().equals("X3") && !entry.getStateCode().equals("X5"))
@@ -54,7 +54,7 @@ public class Main {
         ArrayList<State> stateArrayList = new ArrayList<>();
 
         for (String state : states) {
-            for (int year = 2015; year < 2020; year++) {
+            for (int year = 2020; year < 2021; year++) {
                 int finalYear = year;
                 List<Entry> stateYear = clean.stream()
                         .filter(entry -> entry.getStateCode().equals(state))
@@ -67,7 +67,7 @@ public class Main {
             }
         }
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("src/flipped.csv"));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("src/2020flipped.csv"));
         writer.write("State,Year");
         for (String msn : msns) {
             writer.write("," + msn);
