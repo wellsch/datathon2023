@@ -63,7 +63,7 @@ public class Main {
                 for (Entry entry : stateYear) {
                     msnVals.add(entry.getAmount());
                 }
-                stateArrayList.add(new State(state, finalYear, msnVals));
+                stateArrayList.add(new State(state, finalYear, msnVals, stateYear.get(0).getAssistance(), stateYear.get(0).getNumInvestments(), stateYear.get(0).getEmissions()));
             }
         }
 
@@ -72,7 +72,7 @@ public class Main {
         for (String msn : msns) {
             writer.write("," + msn);
         }
-        writer.write("\n");
+        writer.write(",emissions,numInvestments,assistance\n");
         for (State state : stateArrayList) {
             writer.write(state.toString());
         }
